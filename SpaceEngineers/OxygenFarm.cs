@@ -97,7 +97,8 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
             // between an oxygen and an hydrogen tank.
             // I have therefore decided to just wing the fuck out of it with the super Subtype ID
             return discoveredTanks.Where(
-                t => t.CustomData == "oxygenfarm"
+                t => t.CustomData == "oxygenfarm" &&
+                     t.BlockDefinition.SubtypeId.Contains("Oxygen")
             ).ToList<IMyGasTank>();
         }
 
