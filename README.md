@@ -8,7 +8,7 @@ WARNING: All of this is complete garbage and wrapped in a .NET C# Class Library
 License
 ========
 ```
-Copyright <YEAR> <COPYRIGHT HOLDER>
+Copyright 2017 Alexandre Gauthier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in 
