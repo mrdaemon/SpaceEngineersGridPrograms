@@ -55,8 +55,6 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm {
 
             // Farm Details
             double totalOutput = 0;
-
-            // Farm Details
             var activeFarmsCount = oxygenFarms.Where(
                     f => f.CanProduce &&
                          f.IsWorking &&
