@@ -75,7 +75,7 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
                 "      Oxygen Farm Monitor  v0.1a  \n" +
                 "==================================\n\n" +
                 "     Oxygen Storage: " + Math.Round(filledPercentage, 3) + "%\n" +
-                "  [" + Progress((Int32)filledPercentage, TERMWIDTH) + "]\n\n" +
+                "  [" + RenderProgressBar((Int32)filledPercentage, TERMWIDTH) + "]\n\n" +
                 "Total Tanks: " + storageTanks.Count +"\n" +
                 "Active Farms: " + activeFarmsCount + "/" + oxygenFarms.Count + "\n"
                 );
@@ -121,7 +121,7 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
         }
 
         // Fill and return Progress Bar
-        private string Progress(int percent, int length)
+        private string RenderProgressBar(int percent, int length)
         {
             char[] progressBar = new char[length];
             int completedFactor = Convert.ToInt32(length * percent / 100);
