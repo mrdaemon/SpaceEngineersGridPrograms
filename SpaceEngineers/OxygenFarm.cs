@@ -87,12 +87,11 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
         // On Save Callback
         public void Save()
         {
-            // Called when the program needs to save its state. Use
-            // this method to save your state to the Storage field
-            // or some other means.
-
-            // This method is optional and can be removed if not
-            // needed.
+            // Use the save event callback to refresh known tanks and farms
+            // We have nothing to serialize but this saves some cycles every 100 ticks.
+            // I'm sorry
+            storageTanks = DiscoverStorageTanks(CDATATAG);
+            oxygenFarms = DiscoverOxygenFarms();
         }
 
         private List<IMyGasTank> DiscoverStorageTanks(string cdatatag)
