@@ -5,10 +5,9 @@ This Repository contains Grid Block Programs (i.e. the Program Blocks) for Space
 
 WARNING: All of this is complete garbage and wrapped in a .NET C# Class Library
 
-<aside class="notice">
 This is being actively edited with [Visual Studio Code](https://code.visualstudio.com/),
-you probably should too. Just fix the SteamApps paths in SpaceEngineers.csproj
-</aside>
+you probably should too. Just fix the SteamApps paths in `SpaceEngineers.csproj` and you
+should be Good to Go.
 
 License
 ========
