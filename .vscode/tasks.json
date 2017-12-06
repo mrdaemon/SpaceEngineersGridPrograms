@@ -6,11 +6,13 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "msbuild",
+            "command": "dotnet",
             "args": [
+                "msbuild",
                 // Ask msbuild to generate full paths for file names.
                 "/property:GenerateFullPaths=true",
-                "/t:build"
+                "/t:rebuild",
+                "/p:Configuration=Debug"
             ],
             "group": "build",
             "presentation": {
