@@ -114,7 +114,10 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
             var discoveredFarms = new List<IMyOxygenFarm>();
             GridTerminalSystem.GetBlocksOfType<IMyOxygenFarm>(discoveredFarms);
 
-            return discoveredFarms;
+            // Only return functional farms, ignore half-built or damaged ones.
+            return discoveredFarms.Where(
+                f => f.IsFunctional
+            ).ToList<IMyOxygenFarm>();
         }
 
         // Fill and return Progress Bar
