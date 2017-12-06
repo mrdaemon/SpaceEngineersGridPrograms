@@ -54,8 +54,15 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
             // Storage Tank Details
             double totalCapacity = 0;
             double totalOxygen = 0;
-           
-            foreach(var tank in storageTanks)
+
+            // Farm Details
+            var activeFarmsCount = oxygenFarms.Where(
+                    f => f.CanProduce &&
+                         f.IsWorking
+                ).Count<IMyOxygenFarm>();
+
+            // Inventory oxygen tanks
+            foreach (var tank in storageTanks)
             {
                 totalCapacity += tank.Capacity;
                 totalOxygen += (tank.Capacity * tank.FilledRatio);
@@ -67,10 +74,10 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
                 "==================================\n" +
                 "      Oxygen Farm Monitor  v0.1a  \n" +
                 "==================================\n\n" +
-                "         Oxygen Storage: " + filledPercentage + "%\n  [" +
-                Progress((Int32)filledPercentage, TERMWIDTH) + "]\n\n" +
+                "     Oxygen Storage: " + Math.Round(filledPercentage, 3) + "%\n" +
+                "  [" + Progress((Int32)filledPercentage, TERMWIDTH) + "]\n\n" +
                 "Total Tanks: " + storageTanks.Count +"\n" +
-                "Total Farms: " + oxygenFarms.Count + "\n"
+                "Active Farms: " + activeFarmsCount + "/" + oxygenFarms.Count + "\n"
                 );
 
             // Flush output to display
