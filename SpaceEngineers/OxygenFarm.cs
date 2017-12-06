@@ -15,13 +15,11 @@ using Sandbox.Game.EntityComponents;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using VRage.Game.ObjectBuilders.Definitions;
 
-namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
-{
-    public sealed class Program : MyGridProgram
-    {
-        //=======================================================================
-        //////////////////////////BEGIN//////////////////////////////////////////
-        //=======================================================================
+namespace SpaceEngineers.UWBlockPrograms.OxygenFarm {
+    public sealed class Program : MyGridProgram {
+        // =====================================================================
+        // -- BEGIN PROGRAM BLOCK --
+        // =====================================================================
 
         // Terminal Width is 80 Columns
         static Int32 TERMWIDTH = 80;
@@ -62,8 +60,7 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
                 ).Count<IMyOxygenFarm>();
 
             // Inventory oxygen tanks
-            foreach (var tank in storageTanks)
-            {
+            foreach (var tank in storageTanks) {
                 totalCapacity += tank.Capacity;
                 totalOxygen += (tank.Capacity * tank.FilledRatio);
             }
@@ -76,7 +73,7 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
                 "==================================\n\n" +
                 "     Oxygen Storage: " + Math.Round(filledPercentage, 3) + "%\n" +
                 "  [" + RenderProgressBar((Int32)filledPercentage, TERMWIDTH) + "]\n\n" +
-                "Total Tanks: " + storageTanks.Count +"\n" +
+                "Total Tanks: " + storageTanks.Count + "\n" +
                 "Active Farms: " + activeFarmsCount + "/" + oxygenFarms.Count + "\n"
                 );
 
@@ -126,15 +123,10 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
             char[] progressBar = new char[length];
             int completedFactor = Convert.ToInt32(length * percent / 100);
 
-            for (int i = 0; i < (length-1); i++)
-            {
-                if(i <= completedFactor)
-                {
+            for (int i = 0; i < (length - 1); i++) {
+                if (i <= completedFactor) {
                     progressBar[i] = '|';
-                }
-                else
-                {
-                    
+                } else {
                     progressBar[i] = (char)39;
                 }
             }
@@ -142,9 +134,8 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm
             return new string(progressBar);
         }
 
-//=======================================================================
-//////////////////////////END////////////////////////////////////////////
-//=======================================================================
-
+        // =====================================================================
+        // -- END PROGRAM BLOCK --
+        // =====================================================================
     }
 }

@@ -15,14 +15,12 @@ using Sandbox.Game.EntityComponents;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using VRage.Game.ObjectBuilders.Definitions;
 
-namespace SpaceEngineers.UWBlockPrograms.BatteryMonitor
-{
-    public sealed class Program : MyGridProgram
-    {
- 
-        //=======================================================================
-        //////////////////////////BEGIN//////////////////////////////////////////
-        //=======================================================================
+namespace SpaceEngineers.UWBlockPrograms.BatteryMonitor {
+    public sealed class Program : MyGridProgram {
+
+        // =====================================================================
+        // -- BEGIN PROGRAM BLOCK --
+        // =====================================================================
 
         public Program()
         {
@@ -50,126 +48,89 @@ namespace SpaceEngineers.UWBlockPrograms.BatteryMonitor
             int currentStoredInt = 0;
             int batteryTotal = 0;
 
-            for (int j = 0; j < batteryArray.Count; j++)
-            {
-                if (doNonLocalGrids | batteryArray[j].CubeGrid == displayScreen.CubeGrid)
-                {
+            for (int j = 0; j < batteryArray.Count; j++) {
+                if (doNonLocalGrids | batteryArray[j].CubeGrid == displayScreen.CubeGrid) {
                     string batteryDetailTemp = batteryArray[j].DetailedInfo;
                     string[] batteryDetail = batteryDetailTemp.Split('\n');
 
-                    for (int i = 3; i < 7; i++)
-                    {
+                    for (int i = 3; i < 7; i++) {
                         char[] tempCharArray = batteryDetail[i].ToCharArray();
-                        if (i == 3)
-                        {
+                        if (i == 3) {
                             batteryTotal++;
                             string maxStored = "";
-                            foreach (char ch in tempCharArray)
-                            {
-                                if (char.IsDigit(ch))
-                                {
+                            foreach (char ch in tempCharArray) {
+                                if (char.IsDigit(ch)) {
                                     maxStored = maxStored + ch.ToString();
                                 }
                             }
-                            if (batteryDetail[i].Contains("MW"))
-                            {
+                            if (batteryDetail[i].Contains("MW")) {
                                 maxStored += "0000";
-                            }
-                            else if (batteryDetail[i].Contains("kW"))
-                            {
+                            } else if (batteryDetail[i].Contains("kW")) {
                                 maxStored += "0";
                             }
                             maxStoredInt += Int32.Parse(maxStored);
-                        }
-                        else if (i == 4)
-                        {
+                        } else if (i == 4) {
                             string currentInput = "";
-                            foreach (char ch in tempCharArray)
-                            {
-                                if (char.IsDigit(ch))
-                                {
+                            foreach (char ch in tempCharArray) {
+                                if (char.IsDigit(ch)) {
                                     currentInput = currentInput + ch.ToString();
                                 }
                             }
-                            if (batteryDetail[i].Contains("MW"))
-                            {
+                            if (batteryDetail[i].Contains("MW")) {
                                 currentInput += "0000";
-                            }
-                            else if (batteryDetail[i].Contains("kW"))
-                            {
+                            } else if (batteryDetail[i].Contains("kW")) {
                                 currentInput += "0";
                             }
                             currentInputInt += Int32.Parse(currentInput);
-                        }
-                        else if (i == 5)
-                        {
+                        } else if (i == 5) {
                             string currentOutput = "";
-                            foreach (char ch in tempCharArray)
-                            {
-                                if (char.IsDigit(ch))
-                                {
+                            foreach (char ch in tempCharArray) {
+                                if (char.IsDigit(ch)) {
                                     currentOutput = currentOutput + ch.ToString();
                                 }
                             }
 
-                            if (batteryDetail[i].Contains("MW"))
-                            {
+                            if (batteryDetail[i].Contains("MW")) {
                                 currentOutput += "0000";
-                            }
-                            else if (batteryDetail[i].Contains("kW"))
-                            {
+                            } else if (batteryDetail[i].Contains("kW")) {
                                 currentOutput += "0";
                             }
                             currentOutputInt += Int32.Parse(currentOutput);
-                        }
-                        else
-                        {
+                        } else {
                             string currentStored = "";
 
-                            foreach (char ch in tempCharArray)
-                            {
-                                if (char.IsDigit(ch))
-                                {
+                            foreach (char ch in tempCharArray) {
+                                if (char.IsDigit(ch)) {
                                     currentStored = currentStored + ch.ToString();
                                 }
                             }
 
-                            if (batteryDetail[i].Contains("MW"))
-                            {
+                            if (batteryDetail[i].Contains("MW")) {
                                 currentStored += "0000";
-                            }
-                            else if (batteryDetail[i].Contains("kW"))
-                            {
+                            } else if (batteryDetail[i].Contains("kW")) {
                                 currentStored += "0";
                             }
                             currentStoredInt += Int32.Parse(currentStored);
                         }
                     }
-                }
-                else if (j == batteryArray.Count - 1 & batteryTotal == 0)
-                {
+                } else if (j == batteryArray.Count - 1 & batteryTotal == 0) {
                     noBatteries = true;
                 }
             }
 
             // Get battery percentage
             double percentFilled = 0;
-            if (!noBatteries)
-            {
+            if (!noBatteries) {
                 percentFilled = (double)currentStoredInt / maxStoredInt;
             }
 
             // Progress Bar (80 columns)	  
             char[] fillBar = new char[80];
             int percentFactor = Convert.ToInt32(80 * percentFilled);
-            for (int i = 0; i < 79; i++)
-            {
-                if (i <= percentFactor)
-                {
+            for (int i = 0; i < 79; i++) {
+                if (i <= percentFactor) {
                     fillBar[i] = '|';
-                }
-                else
-                {
+                } else {
                     fillBar[i] = (char)39;
                 }
             }
@@ -181,112 +142,72 @@ namespace SpaceEngineers.UWBlockPrograms.BatteryMonitor
             string currentConverted = "";
             string maxConverted = "";
 
-            if (currentInputInt >= 1000000)
-            {
+            if (currentInputInt >= 1000000) {
                 inputConverted = (currentInputInt / 1000000).ToString() + " MW";
-            }
-            else if (currentInputInt >= 1000)
-            {
+            } else if (currentInputInt >= 1000) {
                 inputConverted = (currentInputInt / 1000).ToString() + " KW";
-            }
-            else
-            {
+            } else {
                 inputConverted = currentInputInt.ToString() + " W";
             }
 
-            if (currentOutputInt >= 1000000)
-            {
+            if (currentOutputInt >= 1000000) {
                 outputConverted = (currentOutputInt / 1000000).ToString() + " MW";
-            }
-            else if (currentOutputInt >= 1000)
-            {
+            } else if (currentOutputInt >= 1000) {
                 outputConverted = (currentOutputInt / 1000).ToString() + " KW";
-            }
-            else
-            {
+            } else {
                 outputConverted = currentOutputInt.ToString() + " W";
             }
 
-            if (currentStoredInt >= 1000000)
-            {
+            if (currentStoredInt >= 1000000) {
                 currentConverted = (currentStoredInt / 1000000).ToString() + " MW";
-            }
-            else if (currentStoredInt >= 1000)
-            {
+            } else if (currentStoredInt >= 1000) {
                 currentConverted = (currentStoredInt / 1000).ToString() + " KW";
-            }
-            else
-            {
+            } else {
                 currentConverted = currentStoredInt.ToString() + " W";
             }
 
-            if (maxStoredInt >= 1000000)
-            {
+            if (maxStoredInt >= 1000000) {
                 maxConverted = (maxStoredInt / 1000000).ToString() + " MW";
-            }
-            else if (maxStoredInt >= 1000)
-            {
+            } else if (maxStoredInt >= 1000) {
                 maxConverted = (maxStoredInt / 1000).ToString() + " KW";
-            }
-            else
-            {
+            } else {
                 maxConverted = maxStoredInt.ToString() + " W";
             }
 
             // Battery Status: charging or discharging?	  
             string chargeDirection = "";
             string chargeStatement = "";
-            if (percentFilled != 1 & batteryTotal > 0)
-            {
-                if (currentInputInt >= currentOutputInt)
-                {
+            if (percentFilled != 1 & batteryTotal > 0) {
+                if (currentInputInt >= currentOutputInt) {
                     string timeString = "";
                     chargeDirection = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
                     double timeBasic = Math.Round((double)(maxStoredInt - currentStoredInt) / (currentInputInt - currentOutputInt) * 60);
-                    if (timeBasic >= 1440)
-                    {
+                    if (timeBasic >= 1440) {
                         timeString = Math.Round(timeBasic / 1440).ToString() + " days";
-                    }
-                    else if (timeBasic >= 60)
-                    {
+                    } else if (timeBasic >= 60) {
                         timeString = Math.Round(timeBasic / 60).ToString() + " hours";
-                    }
-                    else if (timeBasic > 1)
-                    {
+                    } else if (timeBasic > 1) {
                         timeString = timeBasic.ToString() + " minutes";
-                    }
-                    else
-                    {
+                    } else {
                         timeString = "<1 minute";
                     }
                     chargeStatement = "Array fully charged in: " + timeString;
-                }
-                else
-                {
+                } else {
                     string timeString = "";
                     chargeDirection = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
                     double timeBasic = Math.Round((double)currentStoredInt / (currentOutputInt - currentInputInt) * 60);
-                    if (timeBasic >= 1440)
-                    {
+                    if (timeBasic >= 1440) {
                         timeString = Math.Round(timeBasic / 1440).ToString() + " days";
-                    }
-                    else if (timeBasic >= 60)
-                    {
+                    } else if (timeBasic >= 60) {
                         timeString = Math.Round(timeBasic / 60).ToString() + " hours";
-                    }
-                    else if (timeBasic > 1)
-                    {
+                    } else if (timeBasic > 1) {
                         timeString = timeBasic.ToString() + " minutes";
-                    }
-                    else
-                    {
+                    } else {
                         timeString = "<1 minute";
                     }
                     chargeStatement = "Array fully discharged in: " + timeString;
                 }
-            }
-            else
-            {
+            } else {
                 chargeDirection = "-----------------------------------------------------------";
                 chargeStatement = "Array fully charged: Power drain minimal";
             }
@@ -320,9 +241,8 @@ namespace SpaceEngineers.UWBlockPrograms.BatteryMonitor
         //    // needed.
         // }
 
-//=======================================================================
-//////////////////////////END////////////////////////////////////////////
-//=======================================================================
-
+        // =====================================================================
+        // -- END PROGRAM BLOCK --
+        // =====================================================================
     }
 }
