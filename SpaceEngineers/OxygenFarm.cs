@@ -21,10 +21,9 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm {
         // -- BEGIN PROGRAM BLOCK --
         // =====================================================================
 
-        // Terminal Width is 80 Columns
-        static Int32 TERMWIDTH = 80;
-        static string CDATATAG = "oxygenfarm";
-        static string DISPLAYNAME = "Oxygen Farm LCD";
+        static Int32 TERMWIDTH = 80;                   // Terminal Width
+        static string CDATATAG = "oxygenfarm";         // Custom Data Tag
+        static string DISPLAYNAME = "Oxygen Farm LCD"; // Output Display Name
 
         private List<IMyGasTank> storageTanks;
         private List<IMyOxygenFarm> oxygenFarms;
@@ -108,7 +107,7 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm {
             // between an oxygen and an hydrogen tank.
             // I have therefore decided to just wing it with the Type ID String
             return discoveredTanks.Where(
-                t => t.CustomData == "oxygenfarm" &&
+                t => t.CustomData == cdatatag &&
                      t.IsFunctional &&
                      t.BlockDefinition.TypeIdString.Contains("Oxygen")
             ).ToList<IMyGasTank>();
