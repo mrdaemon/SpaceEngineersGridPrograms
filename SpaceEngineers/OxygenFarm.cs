@@ -109,7 +109,7 @@ namespace SpaceEngineers.UWBlockPrograms.OxygenFarm {
             return discoveredTanks.Where(
                 t => t.CustomData == cdatatag &&
                      t.IsFunctional &&
-                     t.BlockDefinition.TypeIdString.Contains("Oxygen")
+                     t.BlockDefinition.TypeId.ToString().Contains("Oxygen")
             ).ToList<IMyGasTank>();
         }
 
