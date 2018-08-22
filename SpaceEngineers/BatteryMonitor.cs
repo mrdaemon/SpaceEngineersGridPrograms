@@ -20,225 +20,182 @@ namespace SpaceEngineers.UWBlockPrograms.BatteryMonitor {
     public sealed class Program : MyGridProgram {
 #endregion
 
+static Int32 TERMWIDTH = 80;
+static string DISPLAYNAME = "Battery Monitor LCD";
+
+private List<IMyBatteryBlock> batteryBlocks;
+private IMyTextPanel displayScreen;
+
+
 public Program()
 {
     // Set update tickrate
     Runtime.UpdateFrequency = UpdateFrequency.Update100;
+
+    // Initialize output screen by name
+    displayScreen = GridTerminalSystem.GetBlockWithName(DISPLAYNAME) as IMyTextPanel;
+
+    // Initialize batteries with output screen as reference grid
+    batteryBlocks = DiscoverBatteries(displayScreen);
+}
+
+public void Save()
+{
+    // We use the save event callback to refresh known battery blocks.
+    // This introduces a delay in updating the display, but it also saves
+    // some cycles every 100 ticks.
+    batteryBlocks = DiscoverBatteries(displayScreen);
 }
 
 public void Main(string args)
 {
-    string displayName = "Battery Monitor LCD";
+    // Array properties
+    Int32 arrayBatteryCount = batteryBlocks.Count();
+    float arrayCapacity = 0;
+    float arrayCurrentInput = 0;
+    float arrayCurrentOutput = 0;
+    float arrayCurrentStoredPower = 0;
+    Int32 arrayPercentCharged = 0;
 
-    // Extend to non-local grids?                    
-    bool doNonLocalGrids = false;
+    // Templating Elements 
+    var arrayChargeDirection = "";
+    var arrayRuntimeStatus = "";
+    
 
-    var displayScreen = GridTerminalSystem.GetBlockWithName(displayName) as IMyTextPanel;
-    bool noBatteries = false;
-
-    var batteryArray = new List<IMyTerminalBlock>();
-    GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(batteryArray);
-
-    // Battery Details
-    int maxStoredInt = 0;
-    int currentInputInt = 0;
-    int currentOutputInt = 0;
-    int currentStoredInt = 0;
-    int batteryTotal = 0;
-
-    for (int j = 0; j < batteryArray.Count; j++) {
-        if (doNonLocalGrids | batteryArray[j].CubeGrid == displayScreen.CubeGrid) {
-            string batteryDetailTemp = batteryArray[j].DetailedInfo;
-            string[] batteryDetail = batteryDetailTemp.Split('\n');
-
-            for (int i = 3; i < 7; i++) {
-                char[] tempCharArray = batteryDetail[i].ToCharArray();
-                if (i == 3) {
-                    batteryTotal++;
-                    string maxStored = "";
-                    foreach (char ch in tempCharArray) {
-                        if (char.IsDigit(ch)) {
-                            maxStored = maxStored + ch.ToString();
-                        }
-                    }
-                    if (batteryDetail[i].Contains("MW")) {
-                        maxStored += "0000";
-                    } else if (batteryDetail[i].Contains("kW")) {
-                        maxStored += "0";
-                    }
-                    maxStoredInt += Int32.Parse(maxStored);
-                } else if (i == 4) {
-                    string currentInput = "";
-                    foreach (char ch in tempCharArray) {
-                        if (char.IsDigit(ch)) {
-                            currentInput = currentInput + ch.ToString();
-                        }
-                    }
-                    if (batteryDetail[i].Contains("MW")) {
-                        currentInput += "0000";
-                    } else if (batteryDetail[i].Contains("kW")) {
-                        currentInput += "0";
-                    }
-                    currentInputInt += Int32.Parse(currentInput);
-                } else if (i == 5) {
-                    string currentOutput = "";
-                    foreach (char ch in tempCharArray) {
-                        if (char.IsDigit(ch)) {
-                            currentOutput = currentOutput + ch.ToString();
-                        }
-                    }
-
-                    if (batteryDetail[i].Contains("MW")) {
-                        currentOutput += "0000";
-                    } else if (batteryDetail[i].Contains("kW")) {
-                        currentOutput += "0";
-                    }
-                    currentOutputInt += Int32.Parse(currentOutput);
-                } else {
-                    string currentStored = "";
-
-                    foreach (char ch in tempCharArray) {
-                        if (char.IsDigit(ch)) {
-                            currentStored = currentStored + ch.ToString();
-                        }
-                    }
-
-                    if (batteryDetail[i].Contains("MW")) {
-                        currentStored += "0000";
-                    } else if (batteryDetail[i].Contains("kW")) {
-                        currentStored += "0";
-                    }
-                    currentStoredInt += Int32.Parse(currentStored);
-                }
-            }
-        } else if (j == batteryArray.Count - 1 & batteryTotal == 0) {
-            noBatteries = true;
-        }
+    // Fetch Battery Status Details
+    foreach(var battery in batteryBlocks) {
+        arrayCapacity += battery.MaxStoredPower;
+        arrayCurrentInput += battery.CurrentInput;
+        arrayCurrentOutput += battery.CurrentOutput;
+        arrayCurrentStoredPower += battery.CurrentStoredPower;
     }
 
-    // Get battery percentage
-    double percentFilled = 0;
-    if (!noBatteries) {
-        percentFilled = (double)currentStoredInt / maxStoredInt;
+    // Determine charged percentage of entire array
+    if(arrayBatteryCount != 0) {
+        arrayPercentCharged = 
+            (Int32)Math.Round((arrayCurrentStoredPower / arrayCapacity) * 100);
     }
 
-    // Progress Bar (80 columns)	  
-    char[] fillBar = new char[80];
-    int percentFactor = Convert.ToInt32(80 * percentFilled);
-    for (int i = 0; i < 79; i++) {
-        if (i <= percentFactor) {
-            fillBar[i] = '|';
-        } else {
-            fillBar[i] = (char)39;
-        }
-    }
+    // Determine whether or not array is charging or discharging, update
+    // status strings accordingly for templating.
+    if(arrayPercentCharged == 100) {
+        arrayChargeDirection = "-----------------------------------------------------------";
+        arrayRuntimeStatus = "Array fully charged: Power drain minimal";
 
-    // Gnarly Spaghetti of alien code that converts Wh to W. Painfully inaccurate and shitty.
-    // TODO: Fix one day
-    string inputConverted = "";
-    string outputConverted = "";
-    string currentConverted = "";
-    string maxConverted = "";
-
-    if (currentInputInt >= 1000000) {
-        inputConverted = (currentInputInt / 1000000).ToString() + " MW";
-    } else if (currentInputInt >= 1000) {
-        inputConverted = (currentInputInt / 1000).ToString() + " KW";
+    } else if (arrayCurrentInput > arrayCurrentOutput) {
+        arrayChargeDirection = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+        arrayRuntimeStatus = "Array fully charged in: " + 
+            RenderRuntimeEstimate(
+                (arrayCapacity - arrayCurrentStoredPower), 
+                (arrayCurrentInput - arrayCurrentOutput)
+            );
     } else {
-        inputConverted = currentInputInt.ToString() + " W";
+        arrayChargeDirection = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+        arrayRuntimeStatus = "Array fully discharged in: " +
+            RenderRuntimeEstimate(
+                arrayCurrentStoredPower,
+                (arrayCurrentOutput - arrayCurrentInput)
+            );
     }
 
-    if (currentOutputInt >= 1000000) {
-        outputConverted = (currentOutputInt / 1000000).ToString() + " MW";
-    } else if (currentOutputInt >= 1000) {
-        outputConverted = (currentOutputInt / 1000).ToString() + " KW";
-    } else {
-        outputConverted = currentOutputInt.ToString() + " W";
-    }
+    // Template terminal output
+    var terminalOutput = new StringBuilder();
 
-    if (currentStoredInt >= 1000000) {
-        currentConverted = (currentStoredInt / 1000000).ToString() + " MW";
-    } else if (currentStoredInt >= 1000) {
-        currentConverted = (currentStoredInt / 1000).ToString() + " KW";
-    } else {
-        currentConverted = currentStoredInt.ToString() + " W";
-    }
+    // Construct Output Header
+    terminalOutput.Append(
+        "==================================\n" +
+        " Battery Array Monitor v3.0: Array Status\n" +
+        "==================================\n\n"
+    );
 
-    if (maxStoredInt >= 1000000) {
-        maxConverted = (maxStoredInt / 1000000).ToString() + " MW";
-    } else if (maxStoredInt >= 1000) {
-        maxConverted = (maxStoredInt / 1000).ToString() + " KW";
-    } else {
-        maxConverted = maxStoredInt.ToString() + " W";
-    }
+    // Battery Charge Progress Bar
+    terminalOutput.Append(
+        "                   Battery Charge: " + arrayPercentCharged + "%\n" +
+        "    [" + RenderProgressBar(arrayPercentCharged, TERMWIDTH) + "]" +
+        "\n\n"
+    );
 
-    // Battery Status: charging or discharging?	  
-    string chargeDirection = "";
-    string chargeStatement = "";
-    if (percentFilled != 1 & batteryTotal > 0) {
-        if (currentInputInt >= currentOutputInt) {
-            string timeString = "";
-            chargeDirection = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-            double timeBasic = Math.Round((double)(maxStoredInt - currentStoredInt) / (currentInputInt - currentOutputInt) * 60);
-            if (timeBasic >= 1440) {
-                timeString = Math.Round(timeBasic / 1440).ToString() + " days";
-            } else if (timeBasic >= 60) {
-                timeString = Math.Round(timeBasic / 60).ToString() + " hours";
-            } else if (timeBasic > 1) {
-                timeString = timeBasic.ToString() + " minutes";
-            } else {
-                timeString = "<1 minute";
-            }
-            chargeStatement = "Array fully charged in: " + timeString;
-        } else {
-            string timeString = "";
-            chargeDirection = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-            double timeBasic = Math.Round((double)currentStoredInt / (currentOutputInt - currentInputInt) * 60);
-            if (timeBasic >= 1440) {
-                timeString = Math.Round(timeBasic / 1440).ToString() + " days";
-            } else if (timeBasic >= 60) {
-                timeString = Math.Round(timeBasic / 60).ToString() + " hours";
-            } else if (timeBasic > 1) {
-                timeString = timeBasic.ToString() + " minutes";
-            } else {
-                timeString = "<1 minute";
-            }
-            chargeStatement = "Array fully discharged in: " + timeString;
-        }
-    } else {
-        chargeDirection = "-----------------------------------------------------------";
-        chargeStatement = "Array fully charged: Power drain minimal";
-    }
+    // Status values
+    terminalOutput.Append(
+        "Total batteries: " + arrayBatteryCount + "\n" +
+        arrayRuntimeStatus +  "\n\n" +
+        "Current Charge: " + RenderPowerValue(arrayCurrentStoredPower) + "\n" +
+        "Maximum Capacity: " + RenderPowerValue(arrayCapacity) + "\n\n"
+    );
 
-    // Display ghetto string template
-    string displayFinal =
-"==================================\n" +
-" Battery Array Monitor v2.0b: Array Status    \n" +
-"==================================\n\n" +
-"                   Battery Charge: " + Math.Round(percentFilled * 100) + "%\n    [" +
-new String(fillBar) + "]\n\n " +
-"Total batteries: " + batteryTotal.ToString() + "\n " +
-chargeStatement + "\n\n " +
-"Current charge: " + currentConverted + "\n " +
-"Maximum capacity: " + maxConverted + "\n\n" +
-chargeDirection + "\n" +
-"    Input: " + inputConverted + "                  Output: " + outputConverted + "\n" +
-chargeDirection;
+    // Input and Output Status
+    terminalOutput.Append(
+        arrayChargeDirection + "\n" +
+        "    Input: " + RenderPowerValue(arrayCurrentInput) +
+        "                  Output: " + RenderPowerValue(arrayCurrentOutput) + "\n" +
+        arrayChargeDirection
+    );
 
-    // Update display
-    displayScreen.WritePublicText(displayFinal);
+    // Flush output to LCD Monitor
+    displayScreen.WritePublicText(terminalOutput);
 }
 
-// public void Save()
-// {
-//    // Called when the program needs to save its state. Use
-//    // this method to save your state to the Storage field
-//    // or some other means.
-//
-//    // This method is optional and can be removed if not
-//    // needed.
-// }
+// Return a list of batteries attached to the parent grid of parentGridBlock
+private List<IMyBatteryBlock> DiscoverBatteries(IMyTerminalBlock parentGridBlock)
+{
+    var discoveredBatteries = new List<IMyBatteryBlock>();
+    GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(discoveredBatteries);
 
+    return discoveredBatteries.Where(
+        b => b.IsFunctional &&
+                b.CubeGrid == parentGridBlock.CubeGrid
+    ).ToList<IMyBatteryBlock>();
+}
+
+private string RenderRuntimeEstimate(float capacity, float load)
+{
+    var renderedValue = "";
+
+    double rawTimeValue = Math.Round(capacity / load * 60);
+    if(rawTimeValue >= 1400) {
+        renderedValue = Math.Round(rawTimeValue / 1440).ToString() + " days";
+    } else if (rawTimeValue >= 60) {
+        renderedValue = Math.Round(rawTimeValue / 60).ToString() + " hours";
+    } else if (rawTimeValue > 1) {
+        renderedValue = rawTimeValue.ToString() + " minutes";
+    } else {
+        renderedValue = "<1 minute";
+    }
+
+    return renderedValue;
+}
+
+// Convenience method to display power values with their suffix.
+private string RenderPowerValue(float power)
+{
+    var renderedValue = "";
+    if(power >= 1.0f) {
+        renderedValue = (Int32)Math.Round(power, 0) + " MW";
+    } else if (power < 0.001f || power == 0) {
+        renderedValue =  "0 W";
+    } else {
+        renderedValue = (Int32)Math.Round((power * 1000), 0) + " kW";
+    }
+
+    return renderedValue;
+}
+
+// Render a progress bar of an arbitrary character length.
+private string RenderProgressBar(int percent, int length)
+{
+    char[] progressBar = new char[length];
+    int completedFactor = Convert.ToInt32(length * percent / 100);
+
+    for (int i=0; i<(length-1); i++) {
+        if (i <= completedFactor) {
+            progressBar[i] = '|';
+        } else {
+            progressBar[i] = (char)39; // apostrophe
+        }
+    }
+
+    return new string(progressBar);
+}
 #region PreludeFooter
     }
 }
