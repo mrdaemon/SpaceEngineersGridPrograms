@@ -55,11 +55,12 @@ public void Main(string args)
     float arrayCurrentInput = 0;
     float arrayCurrentOutput = 0;
     float arrayCurrentStoredPower = 0;
-    Int32 arrayPercentCharged = 0;
+    double arrayPercentCharged = 0;
 
     // Templating Elements 
     var arrayChargeDirection = "";
     var arrayRuntimeStatus = "";
+    Int32 arrayDisplayPercentCharged = 0;
     
 
     // Fetch Battery Status Details
@@ -70,15 +71,17 @@ public void Main(string args)
         arrayCurrentStoredPower += battery.CurrentStoredPower;
     }
 
-    // Determine charged percentage of entire array
+    // Determine charged percentage of entire array, update display value
+    // The higher precision value is used for internal calculations, to avoid an entire
+    // half-megawatt where the array stays "charged" because the value is rounded up.
     if(arrayBatteryCount != 0) {
-        arrayPercentCharged = 
-            (Int32)Math.Round((arrayCurrentStoredPower / arrayCapacity) * 100);
+        arrayPercentCharged = (double)(arrayCurrentStoredPower / arrayCapacity);
+        arrayDisplayPercentCharged = (Int32)Math.Round(arrayPercentCharged * 100);
     }
 
     // Determine whether or not array is charging or discharging, update
     // status strings accordingly for templating.
-    if(arrayPercentCharged == 100) {
+    if(arrayPercentCharged == 1) {
         arrayChargeDirection = "-----------------------------------------------------------";
         arrayRuntimeStatus = "Array fully charged: Power drain minimal";
 
@@ -104,14 +107,14 @@ public void Main(string args)
     // Construct Output Header
     terminalOutput.Append(
         "==================================\n" +
-        " Battery Array Monitor v3.0: Array Status\n" +
+        " Battery Array Monitor v3.1: Array Status\n" +
         "==================================\n\n"
     );
 
     // Battery Charge Progress Bar
     terminalOutput.Append(
-        "                   Battery Charge: " + arrayPercentCharged + "%\n" +
-        "    [" + RenderProgressBar(arrayPercentCharged, TERMWIDTH) + "]" +
+        "                   Battery Charge: " + arrayDisplayPercentCharged + "%\n" +
+        "    [" + RenderProgressBar(arrayDisplayPercentCharged, TERMWIDTH) + "]" +
         "\n\n"
     );
 
