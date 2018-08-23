@@ -117,10 +117,10 @@ public void Main(string args)
 
     // Status values
     terminalOutput.Append(
-        "Total batteries: " + arrayBatteryCount + "\n" +
-        arrayRuntimeStatus +  "\n\n" +
-        "Current Charge: " + RenderPowerValue(arrayCurrentStoredPower) + "\n" +
-        "Maximum Capacity: " + RenderPowerValue(arrayCapacity) + "\n\n"
+        "  Total batteries: " + arrayBatteryCount + "\n" +
+        "  " + arrayRuntimeStatus +  "\n\n" +
+        "  Current Charge: " + RenderPowerValue(arrayCurrentStoredPower) + "\n" +
+        "  Maximum Capacity: " + RenderPowerValue(arrayCapacity) + "\n\n"
     );
 
     // Input and Output Status
