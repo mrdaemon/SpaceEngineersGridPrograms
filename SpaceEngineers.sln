@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceEngineers", "SpaceEngineers\SpaceEngineers.csproj", "{45952BF7-80C5-4844-A209-3DBF8363B08F}"
 EndProject
@@ -12,14 +12,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|AMD64 = Debug|AMD64
+		Release|AMD64 = Release|AMD64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Debug|Any CPU.Build.0 = Debug|x64
-		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Debug|AMD64.ActiveCfg = Release|x64
+		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Debug|AMD64.Build.0 = Release|x64
+		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Release|AMD64.ActiveCfg = Release|x64
+		{45952BF7-80C5-4844-A209-3DBF8363B08F}.Release|AMD64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
