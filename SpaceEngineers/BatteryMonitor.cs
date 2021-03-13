@@ -34,6 +34,7 @@ public Program()
 
     // Initialize output screen by name
     displayScreen = GridTerminalSystem.GetBlockWithName(DISPLAYNAME) as IMyTextPanel;
+    displayScreen.ContentType = VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;
 
     // Initialize batteries with output screen as reference grid
     batteryBlocks = DiscoverBatteries(displayScreen);
@@ -132,7 +133,7 @@ public void Main(string args)
     );
 
     // Flush output to LCD Monitor
-    displayScreen.WritePublicText(terminalOutput);
+    displayScreen.WriteText(terminalOutput);
 }
 
 // Return a list of batteries attached to the parent grid of parentGridBlock
