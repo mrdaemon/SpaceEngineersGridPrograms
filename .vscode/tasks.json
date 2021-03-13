@@ -5,21 +5,14 @@
     "tasks": [
         {
             "label": "build",
-            "type": "shell",
             "command": "dotnet",
+            "type": "process",
             "args": [
-                "msbuild",
-                // Ask msbuild to generate full paths for file names.
+                "build",
+                "${workspaceFolder}/SpaceEngineers/SpaceEngineers.csproj",
                 "/property:GenerateFullPaths=true",
-                "/t:rebuild",
-                "/p:Configuration=Debug"
+                "/consoleloggerparameters:NoSummary"
             ],
-            "group": "build",
-            "presentation": {
-                // Reveal the output only if unrecognized errors occur.
-                "reveal": "silent"
-            },
-            // Use the standard MS compiler pattern to detect errors, warnings and infos
             "problemMatcher": "$msCompile"
         }
     ]
